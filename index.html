@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wicked Numbers – Teacher Lizbeth</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0418;--card:rgba(20,8,40,.84);--cy:#0ff;--pk:#ff2bd6;--or:#ff7a00;--gr:#39ff14;--tx:#f4eaff;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--tx);font-family:'Fredoka',system-ui,sans-serif}
+canvas#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+#app{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:2px solid var(--pk);border-radius:22px;padding:20px;text-align:center;box-shadow:0 0 18px var(--pk),inset 0 0 18px rgba(255,43,214,.25)}
+h1{font-family:'Creepster',cursive,system-ui;font-size:3.4rem;margin:4px 0;color:var(--or);text-shadow:0 0 8px var(--or),0 0 24px var(--or);letter-spacing:2px;font-weight:400}
+h2{color:var(--cy);text-shadow:0 0 10px var(--cy);margin:6px 0}
+.sub{color:var(--cy);text-shadow:0 0 8px var(--cy);font-size:1.1rem}
+.by{color:var(--gr);text-shadow:0 0 8px var(--gr);font-size:1.2rem;margin:4px 0 10px}
+input[type=text]{width:100%;font:inherit;font-size:1.2rem;padding:12px;border-radius:14px;border:2px solid var(--cy);background:#10052a;color:var(--tx);box-shadow:0 0 10px var(--cy);text-align:center;margin:8px 0}
+label{display:block;text-align:left;color:var(--cy);margin-top:8px}
+.row{display:flex;gap:10px;justify-content:center;margin:8px 0;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;font-size:1.15rem;padding:12px 18px;border-radius:16px;border:2px solid var(--gr);background:#0d1f10;color:var(--gr);cursor:pointer;box-shadow:0 0 12px var(--gr);text-shadow:0 0 6px var(--gr);transition:transform .1s}
+.btn:hover{transform:scale(1.05)}.btn:active{transform:scale(.96)}
+.btn.sel{background:var(--gr);color:#041;text-shadow:none}
+.btn.pk{border-color:var(--pk);color:var(--pk);background:#240a2a;box-shadow:0 0 12px var(--pk);text-shadow:0 0 6px var(--pk)}
+.btn.cy{border-color:var(--cy);color:var(--cy);background:#062a2e;box-shadow:0 0 12px var(--cy);text-shadow:0 0 6px var(--cy)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.opts .btn{font-size:1.35rem;border-color:var(--or);color:var(--or);background:#2a1300;box-shadow:0 0 10px var(--or);text-shadow:0 0 6px var(--or)}
+.opts .btn.ok{background:var(--gr);color:#041;border-color:var(--gr);box-shadow:0 0 18px var(--gr);text-shadow:none}
+.opts .btn.no{background:#600;color:#fff;border-color:#f33;box-shadow:0 0 18px #f33}
+.big{font-size:5rem;line-height:1.1;animation:fl 2.5s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-8px) rotate(4deg)}}
+.hud{display:flex;justify-content:space-between;color:var(--cy);margin-bottom:8px;font-size:1rem;gap:6px}
+.bar{height:10px;border-radius:8px;background:#20093a;margin-bottom:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pk),var(--or));box-shadow:0 0 10px var(--pk);transition:width .3s}
+.fb{min-height:1.5em;font-size:1.2rem;margin-top:8px;font-weight:600}
+.word{font-size:2.2rem;color:var(--or);text-shadow:0 0 12px var(--or);font-weight:600}
+.digit{font-size:6rem;font-family:'Creepster',cursive,system-ui;color:var(--cy);text-shadow:0 0 14px var(--cy),0 0 34px var(--cy);line-height:1}
+/* sky */
+.sky{position:relative;height:230px;border-radius:16px;overflow:hidden;background:linear-gradient(#150637,#3b0a5e 70%,#6b0f5a);border:2px solid var(--cy);box-shadow:0 0 14px var(--cy)}
+.moon{position:absolute;right:14px;top:8px;font-size:2.2rem;filter:drop-shadow(0 0 10px #ff0)}
+.cloud{position:absolute;font-size:2.4rem;opacity:.5;left:100%;animation:drift 12s linear infinite}
+.c1{top:40px}.c2{top:115px;animation-duration:18s;animation-delay:-6s}
+@keyframes drift{to{transform:translateX(-760px)}}
+.ground{position:absolute;bottom:0;left:0;right:0;height:42px;background:linear-gradient(transparent,rgba(255,43,43,.4));border-top:2px dashed #f33;font-size:1.6rem;display:flex;justify-content:space-around;align-items:flex-end}
+#witch{position:absolute;left:18%;top:0;font-size:3.2rem;will-change:transform}
+#witch span{display:inline-block;animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-6deg)}}
+#witch.boost{filter:drop-shadow(0 0 14px var(--gr))}
+#witch.hurt{filter:drop-shadow(0 0 14px #f33)}
+.alt{height:12px;border-radius:8px;background:#20093a;margin:10px 0 2px;overflow:hidden}
+.alt i{display:block;height:100%;background:var(--gr);box-shadow:0 0 10px var(--gr);width:80%}
+.alt.low i{background:#f33;box-shadow:0 0 10px #f33}
+.seq{display:flex;justify-content:center;gap:14px;font-size:2.6rem;font-weight:600;margin:8px 0 0}
+.seq span{color:var(--cy);text-shadow:0 0 10px var(--cy)}
+.seq .q{color:var(--or);text-shadow:0 0 12px var(--or);animation:pu 1s infinite}
+@keyframes pu{50%{transform:scale(1.25)}}
+.qt{font-size:1.05rem;opacity:.9}
+.rep{border-color:var(--cy);box-shadow:0 0 22px var(--cy),inset 0 0 22px rgba(0,255,255,.2)}
+.rep table{width:100%;border-collapse:collapse;margin:12px 0;font-size:1.1rem}
+.rep td{padding:6px 4px;border-bottom:1px dashed rgba(0,255,255,.4)}
+.rep td:last-child{text-align:right;color:var(--gr);font-weight:600}
+.grade{font-size:5rem;font-family:'Creepster',cursive,system-ui;color:var(--gr);text-shadow:0 0 12px var(--gr),0 0 30px var(--gr);line-height:1}
+.small{font-size:.95rem;opacity:.85}
+.over{border-color:#f33;box-shadow:0 0 22px #f33,inset 0 0 22px rgba(255,50,50,.25)}
+@media(max-width:420px){h1{font-size:2.7rem}.big{font-size:4rem}.digit{font-size:5rem}}
+
+.ghostw{max-width:440px;margin:0 auto;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 10px #fff);color:#fff}
+.gh{position:relative;border:2px solid #fff;border-bottom:none;border-radius:50% 50% 0 0/150px 150px 0 0;background:rgba(11,4,24,.62);padding:125px 20px 6px;text-align:center}
+.eyes{position:absolute;top:48px;left:0;right:0;display:flex;justify-content:center;gap:56px}
+.eyes i{width:24px;height:38px;border:2px solid #fff;border-radius:50%}
+.gt{font-family:'Creepster',cursive,system-ui;font-size:2.3rem;letter-spacing:2px}
+.gs{font-size:.98rem;margin:3px 0;font-weight:400}
+.gn{font-size:1.4rem;margin-top:6px}
+.gh table{width:100%;border-collapse:collapse;margin:10px 0;font-size:1.05rem}
+.gh td{padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.7)}
+.gh td:last-child{text-align:right}
+.gg{font-family:'Creepster',cursive,system-ui;font-size:4.6rem;line-height:1}
+.wave{display:block;width:100%;height:50px;margin-top:-1px;overflow:visible}
+.wave .wf{fill:rgba(11,4,24,.62);stroke:none}
+.wave .wl{fill:none;stroke:#fff;stroke-width:2;vector-effect:non-scaling-stroke}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div id="app"></div>
+<script>
+// ---------- Background ----------
+const cv=document.getElementById('bg'),cx=cv.getContext('2d');let W,H;
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight}rs();addEventListener('resize',rs);
+const icons=['🦇','👻','🎃','🕸️','💀','🕷️','🍬','🌙'];
+const fl=Array.from({length:26},()=>({e:icons[Math.random()*icons.length|0],x:Math.random()*innerWidth,y:Math.random()*innerHeight,s:20+Math.random()*34,vx:(Math.random()-.5)*1.2,vy:(Math.random()-.5)*.8,p:Math.random()*6}));
+const st=Array.from({length:60},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.8+.4,p:Math.random()*6,c:['#0ff','#ff2bd6','#39ff14','#ff7a00'][Math.random()*4|0]}));
+function draw(t){cx.clearRect(0,0,W,H);
+ st.forEach(s=>{cx.globalAlpha=.4+.6*Math.abs(Math.sin(t/700+s.p));cx.fillStyle=s.c;cx.shadowColor=s.c;cx.shadowBlur=10;cx.beginPath();cx.arc(s.x,s.y,s.r,0,7);cx.fill()});
+ cx.shadowBlur=0;cx.globalAlpha=.55;
+ fl.forEach(f=>{f.x+=f.vx;f.y+=f.vy+Math.sin(t/600+f.p)*.4;if(f.x<-60)f.x=W+40;if(f.x>W+60)f.x=-40;if(f.y<-60)f.y=H+40;if(f.y>H+60)f.y=-40;cx.font=f.s+'px serif';cx.fillText(f.e,f.x,f.y)});
+ requestAnimationFrame(draw)}requestAnimationFrame(draw);
+
+// ---------- Helpers ----------
+const WD=['zero','one','two','three','four','five','six','seven','eight','nine','ten'];
+const $=id=>document.getElementById(id),app=$('app');
+const shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+const r=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const norm=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z ]/g,' ').replace(/\s+/g,' ').trim();
+function lev(a,b){const m=[];for(let i=0;i<=a.length;i++){m[i]=[i];}for(let j=1;j<=b.length;j++)m[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return m[a.length][b.length]}
+const sim=(a,b)=>1-lev(a,b)/Math.max(a.length,b.length,1);
+let VO=null;function pickVoice(){try{const v=speechSynthesis.getVoices().filter(x=>/^en/i.test(x.lang)&&!/(?<!fe)male/i.test(x.name));for(const p of ['samantha','google us english','zira','aria','jenny','karen','victoria','hazel','susan','libby','sonia','allison','ava','moira','tessa','fiona','serena','female']){const f=v.find(x=>x.name.toLowerCase().includes(p));if(f){VO=f;return}}VO=null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t==='p.e.'?'P E':t);u.lang='en-US';u.rate=.8;if(VO){u.voice=VO}else{u.pitch=1.3}speechSynthesis.speak(u)}catch(e){}}
+let ac;function beep(ok){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type='triangle';o.frequency.value=ok?660:180;g.gain.value=.08;o.start();if(ok)o.frequency.setValueAtTime(880,ac.currentTime+.1);o.stop(ac.currentTime+.25)}catch(e){}}
+const S={name:'',gr:'4',grp:'A',falls:0,fly:0,wr:0,sy:0,q:[],i:0,pts:0};
+const F={qs:[],qi:0,alt:80,disp:80,run:false,lock:false,last:0};
+
+// ---------- Front page ----------
+function home(){
+app.innerHTML=`<div class="card"><div style="font-size:3rem">🧙‍♀️🎃🦇</div><h1>Wicked Numbers</h1><div class="sub">Keep the witch flying! Count 0 – 10</div><div class="by">by Teacher Lizbeth</div>
+<label for="nm">✏️ Write your name:</label><input type="text" id="nm" maxlength="30" placeholder="Your name here" autocomplete="off" value="${S.name.replace(/"/g,'')}">
+<label>Choose your grade:</label><div class="row" id="rg">${['4','5','6'].map(g=>`<button class="btn" data-v="${g}">${g}th</button>`).join('')}</div>
+<label>Choose your group:</label><div class="row" id="rp">${['A','B'].map(g=>`<button class="btn" data-v="${g}">Group ${g}</button>`).join('')}</div>
+<button class="btn pk" id="go" style="margin-top:12px;font-size:1.4rem">🧙‍♀️ Start Flying!</button></div>`;
+const pick=(id,key)=>{const bs=[...$(id).children];const set=v=>{S[key]=v;bs.forEach(b=>b.classList.toggle('sel',b.dataset.v===v))};bs.forEach(b=>b.onclick=()=>set(b.dataset.v));set(S[key])};
+pick('rg','gr');pick('rp','grp');
+$('go').onclick=()=>{const v=$('nm').value.trim();if(!v){$('nm').focus();$('nm').placeholder='Please write your name 👆';return}S.name=v;S.falls=0;S.wr=0;S.sy=0;introFly()}}
+
+// ---------- Phase 1: flight ----------
+function buildQ(){const Q=[];
+ for(let n=0;n<=10;n++){const s=[];for(let k=Math.max(0,n-3);k<n;k++)s.push(k);Q.push({l:1,seq:[...s,'?'],a:n,t:n?'What number comes next?':'Where do we start counting?'})}
+ for(let n=10;n>=0;n--){const s=[];for(let k=Math.min(10,n+3);k>n;k--)s.push(k);Q.push({l:2,seq:[...s,'?'],a:n,t:n<10?'Count down! What comes next?':'Count down! Where do we start?'})}
+ const g=[()=>{const a=r(0,4);return{seq:[a,a+2,a+4,'?'],a:a+6,t:'Skip counting! Keep the pattern.'}},
+ ()=>{const a=r(6,10);return{seq:[a,a-2,a-4,'?'],a:a-6,t:'Skip counting down!'}},
+ ()=>{const a=r(0,9);return{seq:[a,'?'],a:a+1,t:'What number comes AFTER?'}},
+ ()=>{const a=r(1,10);return{seq:['?',a],a:a-1,t:'What number comes BEFORE?'}},
+ ()=>{const a=r(1,9);return{seq:[a-1,'?',a+1],a:a,t:'Find the missing number!'}}];
+ const m=[];for(let i=0;i<11;i++){const x=g[i%5]();x.l=3;m.push(x)}
+ return Q.concat(shuf(m))}
+const ES={'What number comes next?':'¿Qué número sigue?','Where do we start counting?':'¿Con qué número empezamos a contar?','Count down! What comes next?':'¡Cuenta hacia atrás! ¿Qué número sigue?','Count down! Where do we start?':'¡Cuenta hacia atrás! ¿Con qué número empezamos?','Skip counting! Keep the pattern.':'¡Salta números! Sigue el patrón.','Skip counting down!':'¡Salta números hacia atrás!','What number comes AFTER?':'¿Qué número va DESPUÉS?','What number comes BEFORE?':'¿Qué número va ANTES?','Find the missing number!':'¡Encuentra el número que falta!'};
+const LV=['Level 1 · Count up','Level 2 · Count down','Level 3 · Mix it up!'],RATE=[2.6,3.5,4.4],SPD=()=>({'4':1,'5':1.3,'6':1.5}[S.gr]||1);
+
+function introFly(){
+app.innerHTML=`<div class="card"><div class="big">🧙‍♀️</div><div class="small">Part 1 of 3</div><h2>Flight Challenge!</h2>
+<p style="font-size:1.15rem">Toca la <b>palabra del número</b> que continúa la secuencia. ✅ Respuesta correcta = la bruja vuela más alto. ❌ Respuesta incorrecta = ¡la bruja baja!<br>Además, la bruja baja poco a poco, ¡así que sé rápido(a)! Si toca el suelo, empiezas otra vez. 💀</p>
+<button class="btn pk" id="st" style="font-size:1.3rem">Fly! ▶</button></div>`;
+$('st').onclick=()=>{ac&&ac.resume&&ac.resume();startFlight()}}
+
+function startFlight(){
+F.qs=buildQ();F.qi=0;F.alt=F.disp=80;F.lock=false;F.run=true;
+app.innerHTML=`<div class="card" style="padding:12px"><div class="hud"><span id="lv"></span><span id="qn"></span><span id="fl"></span></div>
+<div class="sky"><div class="moon">🌕</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><div id="witch"><span>🧙‍♀️</span></div><div class="ground">🪦🎃🪦🪦🎃🪦</div></div>
+<div class="alt" id="alt"><i id="altb"></i></div><div class="small">✨ Magic power</div>
+<div class="seq" id="seq"></div><div class="qt" id="qt"></div><div class="opts" id="op"></div><div class="fb" id="fb"></div></div>`;
+showQ();F.last=performance.now();requestAnimationFrame(loop)}
+
+function showQ(){const q=F.qs[F.qi];F.lock=false;
+$('lv').textContent=LV[q.l-1];$('qn').textContent=(F.qi+1)+'/'+F.qs.length;$('fl').textContent='💀 '+S.falls;
+$('seq').innerHTML=q.seq.map(x=>`<span class="${x==='?'?'q':''}">${x}</span>`).join('');$('qt').textContent=ES[q.t]||q.t;$('fb').textContent='';
+const pool=[...Array(11).keys()].filter(n=>n!==q.a).map(n=>[Math.abs(n-q.a)+Math.random()*2.5,n]).sort((a,b)=>a[0]-b[0]).slice(0,3).map(x=>x[1]);
+const o=shuf([q.a,...pool]);
+$('op').innerHTML=o.map(n=>`<button class="btn" data-n="${n}">${WD[n]}</button>`).join('');
+document.querySelectorAll('#op .btn').forEach(b=>b.onclick=()=>pickAns(b,+b.dataset.n))}
+
+function pickAns(b,n){if(F.lock||!F.run)return;F.lock=true;const q=F.qs[F.qi],ok=n===q.a,w=$('witch');
+b.classList.add(ok?'ok':'no');beep(ok);
+if(ok){F.alt=Math.min(100,F.alt+15);w.classList.add('boost');setTimeout(()=>w.classList.remove('boost'),400)}
+else{F.alt-=25;w.classList.add('hurt');setTimeout(()=>w.classList.remove('hurt'),500);document.querySelectorAll('#op .btn').forEach(x=>{if(+x.dataset.n===q.a)x.classList.add('ok')});$('fb').style.color='#ff7a00';$('fb').textContent='👻 It is: '+WD[q.a]}
+setTimeout(()=>{if(!F.run)return;F.qi++;if(F.qi>=F.qs.length){F.run=false;S.fly=Math.max(0,11-S.falls);introWrite()}else showQ()},ok?380:1100)}
+
+function loop(t){if(!F.run)return;const dt=Math.min(.1,(t-F.last)/1000);F.last=t;
+const q=F.qs[F.qi]||F.qs[0];F.alt-=RATE[q.l-1]*SPD()*dt;F.disp+=(Math.max(F.alt,0)-F.disp)*Math.min(1,dt*6);
+$('witch').style.transform=`translateY(${(1-F.disp/100)*138}px)`;$('altb').style.width=Math.max(0,F.disp)+'%';$('alt').classList.toggle('low',F.disp<28);
+if(F.alt<=0){crash();return}requestAnimationFrame(loop)}
+
+function crash(){F.run=false;S.falls++;beep(false);const w=$('witch');w.style.transition='transform .9s ease-in';w.style.transform='translateY(190px) rotate(540deg)';
+setTimeout(()=>{app.innerHTML=`<div class="card over"><div class="big">💀</div><h2 style="color:#ff5555;text-shadow:0 0 10px #f33">The witch fell!</h2><p style="font-size:1.2rem">¡Oh no! No te rindas: empiezas otra vez desde el principio. 🧙‍♀️</p><button class="btn pk" id="rs" style="font-size:1.3rem">🔁 Try again</button></div>`;$('rs').onclick=startFlight},1100)}
+
+// ---------- Phase 2 & 3 ----------
+function introWrite(){
+app.innerHTML=`<div class="card"><div class="big">🎉</div><h2>The witch is flying!</h2><div class="small">Part 2 of 3</div><h2>Listen & Write ✍️</h2><p style="font-size:1.2rem">Listen to the number 🔊 and type it with words.</p><button class="btn pk" id="st" style="font-size:1.3rem">Let’s go! ▶</button></div>`;
+$('st').onclick=()=>{S.q=shuf([...Array(11).keys()]);S.i=0;S.pts=0;write()}}
+function introSay(){
+app.innerHTML=`<div class="card"><div class="big">🎤</div><div class="small">Part 3 of 3</div><h2>Look & Say 🎤</h2><p style="font-size:1.2rem">Look at the number and say it out loud. It doesn’t have to be perfect!</p><button class="btn pk" id="st" style="font-size:1.3rem">Let’s go! ▶</button></div>`;
+$('st').onclick=()=>{S.q=shuf([...Array(11).keys()]);S.i=0;S.pts=0;speak()}}
+const hud=(t)=>`<div class="hud"><span>${t}</span><span>${S.i+1}/11</span><span>⭐ ${S.pts}</span></div><div class="bar"><i style="width:${S.i/11*100}%"></i></div>`;
+function fb(ok,m){const f=$('fb');f.style.color=ok?'#39ff14':'#ff7a00';f.textContent=m;beep(ok)}
+function nxt(ok,ms,fin){const k=S.i;if(ok)S.pts++;setTimeout(()=>{if(S.i!==k)return;S.i++;S.i<11?fin.again():fin.end()},ms)}
+
+function write(){const n=S.q[S.i],t=WD[n];
+app.innerHTML=`<div class="card">${hud('Listen & Write')}<div class="big">🔊</div><button class="btn cy" id="sp">🔊 Listen again</button><input type="text" id="an" placeholder="Type the number word" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn pk" id="ck">Check ✔</button><div class="fb" id="fb"></div></div>`;
+$('sp').onclick=()=>say(t);setTimeout(()=>say(t),300);$('an').focus();
+let lock=0;const chk=()=>{if(lock)return;const a=norm($('an').value).replace(/ /g,'');if(!a)return;lock=1;
+ const ok=a===t||(t.length>=5&&lev(a,t)<=1);fb(ok,ok?'✨ Perfect! '+n:'👻 Correct: '+t+' ('+n+')');
+ nxt(ok,1600,{again:write,end:()=>{S.wr=S.pts;introSay()}})};
+$('ck').onclick=chk;$('an').onkeydown=e=>{if(e.key==='Enter')chk()}}
+
+const HM={to:'two',too:'two',tu:'two',for:'four',fore:'four',won:'one',wan:'one',ate:'eight',tree:'three',free:'three',sick:'six',sicks:'six',nein:'nine',hero:'zero',juan:'one',when:'one',want:'one',on:'one',wand:'one',run:'one',then:'ten',than:'ten',tan:'ten',tent:'ten',do:'two',floor:'four',fire:'five',heaven:'seven',line:'nine',wine:'nine',sics:'six',cero:'zero'};
+const toks=a=>norm(a.replace(/\d+/g,d=>' '+(WD[+d]||'')+' ')).split(' ').map(w=>HM[w]||w);
+function speak(){const n=S.q[S.i],t=WD[n];const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let tries=0;
+app.innerHTML=`<div class="card">${hud('Look & Say')}<div class="digit">${n}</div><div style="font-size:1.5rem;min-height:1.8em">${n?'🎃'.repeat(n):'🕸️'}</div><button class="btn cy" id="sp">🔊 Hear it</button> <button class="btn pk" id="mic">🎤 Speak</button><div class="fb" id="fb"></div>${SR?'':'<p class="small">Your browser can’t hear you. Say the number out loud, then tap below.</p><button class="btn" id="hon">I said it! ✅</button>'}</div>`;
+$('sp').onclick=()=>say(t);
+const fin={again:speak,end:()=>{S.sy=S.pts;report()}};
+const win=()=>{fb(true,'🎉 Nice! It is “'+t+'”');nxt(true,1200,fin)};
+if(!SR){$('mic').style.display='none';$('hon').onclick=win;return}
+const skip=()=>{if($('sk'))return;const b=document.createElement('button');b.id='sk';b.className='btn';b.style.marginTop='10px';b.textContent='Next ▶';b.onclick=()=>{b.disabled=true;nxt(false,200,fin)};$('fb').after(b)};let busy=0;$('mic').onclick=()=>{if(busy)return;busy=1;const rc=new SR();rc.lang='en-US';rc.maxAlternatives=5;
+ $('fb').style.color='#0ff';$('fb').textContent='🎧 Listening...';$('mic').textContent='🔴 ...';
+ rc.onresult=e=>{const alts=[...e.results[0]].map(a=>a.transcript);
+  const ok=alts.some(a=>toks(a).some(w=>w===t||(sim(w,t)>=(t.length<=3?.5:.6)&&WD.every(x=>x===t||sim(w,x)<=sim(w,t)))));
+  busy=0;$('mic').textContent='🎤 Speak';
+  if(ok)win();else{tries++;if(tries>=3){fb(false,'👻 Good try! It is “'+t+'”');say(t);nxt(false,2200,fin)}else{fb(false,'🙂 Almost! Try again ('+tries+'/3)');skip()}}};
+ rc.onerror=()=>{skip();busy=0;$('mic').textContent='🎤 Speak';$('fb').textContent='🙂 I didn’t hear you. Tap Speak again.'};
+ rc.onend=()=>{if(busy){busy=0;$('mic').textContent='🎤 Speak'}};
+ try{rc.start()}catch(e){busy=0}}}
+
+// ---------- Report ----------
+function report(){const tot=S.fly+S.wr+S.sy,max=33,g=Math.round((6+4*tot/max)*10)/10,gs=Number.isInteger(g)?g+'':g.toFixed(1);
+const msg=g>=9.5?'🏆 Spooky-tacular! Amazing work!':g>=8.5?'🌟 Fantastic job!':g>=7.5?'🎃 Great work! Keep practicing!':g>=6.8?'👻 Good effort! Practice a little more!':'🦇 Keep trying — you can do it!';
+const d=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+app.innerHTML=`<div class="ghostw"><div class="gh"><div class="eyes"><i></i><i></i></div>
+<div class="gt">Wicked Numbers</div><div class="gs">Report Card · Teacher Lizbeth</div>
+<div class="gn">${S.name.replace(/</g,'&lt;')}</div><div class="gs">${S.gr}th grade · Group ${S.grp}</div><div class="gs">${d}</div>
+<table><tr><td>Flight (${S.falls} fall${S.falls==1?'':'s'})</td><td>${S.fly} / 11</td></tr><tr><td>Listen & Write</td><td>${S.wr} / 11</td></tr><tr><td>Look & Say</td><td>${S.sy} / 11</td></tr><tr><td><b>Total</b></td><td>${tot} / ${max}</td></tr></table>
+<div class="gs">Final grade</div><div class="gg">${gs}</div><div class="gs">${msg}</div><div class="gs">📸 Take a screenshot and send it to the English book!</div></div>
+<svg class="wave" viewBox="0 -10 400 60" preserveAspectRatio="none"><path class="wf" d="M1,0 V20 Q25.9,60 50.75,20 T100.5,20 T150.25,20 T200,20 T249.75,20 T299.5,20 T349.25,20 T399,20 V0 Z"/><path class="wl" d="M1,0 V20 Q25.9,60 50.75,20 T100.5,20 T150.25,20 T200,20 T249.75,20 T299.5,20 T349.25,20 T399,20 V0"/></svg></div>
+<div class="row" style="margin-top:14px"><button class="btn cy" id="again">🔁 Play again</button></div>`;
+$('again').onclick=home}
+home();
+</script>
+</body>
+</html>
